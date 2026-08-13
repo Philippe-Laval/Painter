@@ -2,6 +2,9 @@
 
 namespace Paint.ViewModels.Drawing
 {
+    /// <summary>
+    /// Abstract class for drawing tools
+    /// </summary>
     public abstract class Tool
     {
         public abstract void Pressed(IPainter painter, Point point);

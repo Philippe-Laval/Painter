@@ -8,7 +8,10 @@ using Paint.ViewModels.Drawing;
 
 namespace Paint.Views
 {
-    public class PaintView : UserControl
+    /// <summary>
+    /// UserControl 
+    /// </summary>
+    public partial class PaintView : UserControl
     {
         private readonly Painter _painter;
 
@@ -19,14 +22,10 @@ namespace Paint.Views
             _painter = new Painter(400, 400);
             _painter.Invalidate += (_, _) => this.InvalidateVisual();
 
+            // Forward the events to the _painter object
             AddHandler(PointerPressedEvent, PointerPressedHandler, RoutingStrategies.Tunnel);
             AddHandler(PointerReleasedEvent, PointerReleaseHandler, RoutingStrategies.Tunnel);
             AddHandler(PointerMovedEvent, PointerMovedHandler, RoutingStrategies.Tunnel);
-        }
-
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
         }
 
         private void PointerPressedHandler(object? sender, PointerPressedEventArgs e)
@@ -44,12 +43,22 @@ namespace Paint.Views
             _painter.Moved(e.GetPosition(this));
         }
 
+        /// <summary>
+        /// Render the UserControl by asking _painter to render itself
+        /// </summary>
+        /// <param name="context"></param>
         public override void Render(DrawingContext context)
         {
             base.Render(context);
 
-            // context.DrawRectangle(null, new Pen(Brushes.Black, 2), new Rect(0, 0, Bounds.Width, Bounds.Height));
-  
+            // Usual draw operation without Skia
+            //
+            //var rect = new Rect(0, 0, Bounds.Width, Bounds.Height);
+            //string colorString = "#FF5733"; // Hexadecimal color code
+            //SolidColorBrush brush = new SolidColorBrush(Color.Parse(colorString));
+            //
+            //context.DrawRectangle(brush, new Pen(Brushes.Black, 4), rect);
+
             _painter.Render(context);
         }
     }

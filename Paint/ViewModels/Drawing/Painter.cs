@@ -10,11 +10,19 @@ namespace Paint.ViewModels.Drawing
     {
         private int _width;
         private int _height;
+
         private SKBitmap _original;
         private SKBitmap _working;
+        
+        /// <summary>
+        /// List of drawing oepration
+        /// </summary>
         private List<DrawOperation> _drawOperations;
         private Tool? _currentTool;
 
+        /// <summary>
+        /// Event handler
+        /// </summary>
         public event EventHandler<EventArgs>? Invalidate;
         
         public Painter(int width, int height)
@@ -35,6 +43,10 @@ namespace Paint.ViewModels.Drawing
             ClearOriginal();
         }
 
+        /// <summary>
+        /// Calls the Invalidate hadler if not null
+        /// </summary>
+        /// <param name="e"></param>
         protected virtual void OnInvalidate(EventArgs e) => Invalidate?.Invoke(this, e);
 
         public void AddOperation(DrawOperation drawOperation)
@@ -52,21 +64,36 @@ namespace Paint.ViewModels.Drawing
             OnInvalidate(new EventArgs());
         }
 
+        /// <summary>
+        /// Handles the pointer pressed event by forwarding the info to the _currentTool.
+        /// </summary>
+        /// <param name="point"></param>
         public void Pressed(Point point)
         {
             _currentTool?.Pressed(this, point);
         }
 
+        /// <summary>
+        /// Handles the pointer released event by forwarding the info to the _currentTool.
+        /// </summary>
+        /// <param name="point"></param>
         public void Released(Point point)
         {
             _currentTool?.Released(this, point);
         }
 
+        /// <summary>
+        /// Handles the pointer moved event by forwarding the info to the _currentTool.
+        /// </summary>
+        /// <param name="point"></param>
         public void Moved(Point point)
         {
             _currentTool?.Moved(this, point);
         }
-        
+
+        /// <summary>
+        /// Clears the _original SKBitmap
+        /// </summary>
         private void ClearOriginal()
         {
             using var canvas = new SKCanvas(_original);
@@ -74,6 +101,9 @@ namespace Paint.ViewModels.Drawing
             canvas.Clear(SKColors.White);
         }
 
+        /// <summary>
+        /// Renders all the drawOperations on _working SKBitmap
+        /// </summary>
         private void BlitWorking()
         {
             using var canvas = new SKCanvas(_working);
@@ -88,12 +118,18 @@ namespace Paint.ViewModels.Drawing
             }
         }
 
+        /// <summary>
+        /// Render the _working SKBitmap on the AvaloniaUI DrawingContext
+        /// </summary>
+        /// <param name="context"></param>
         public void Render(DrawingContext context)
         {
             BlitWorking();
 
             var bounds = new Rect(0, 0, _width, _height);
             var custom = new SkiaBitmapCustomDrawOperation(_working, bounds);
+
+            // Draws on the AvaloniaUI DrawingContext
             context.Custom(custom);
         }
     }

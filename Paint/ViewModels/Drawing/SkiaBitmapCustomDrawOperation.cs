@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
@@ -22,17 +23,17 @@ namespace Paint.ViewModels.Drawing
 
         public bool HitTest(Point p) => false;
 
-        public void Render(IDrawingContextImpl context)
+        public void Render(ImmediateDrawingContext context)
         {
-            if (context is not ISkiaDrawingContextImpl skiaDrawingContextImpl)
-            {
+            var leaseFeature = context.TryGetFeature<ISkiaSharpApiLeaseFeature>();
+            if (leaseFeature == null)
                 return;
-            }
 
-            if (skiaDrawingContextImpl.SkCanvas is { } canvas)
-            {
-                canvas.DrawBitmap(_bitmap, SKPoint.Empty);
-            }
+            using var lease = leaseFeature.Lease();
+            var canvas = lease.SkCanvas;
+
+            // Draws the SKBitmap on the SkCanvas 
+            canvas?.DrawBitmap(_bitmap, SKPoint.Empty);
         }
 
         public Rect Bounds { get; }
